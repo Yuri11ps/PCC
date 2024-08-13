@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block main %}
+    <div class="mt-5">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">Nome</h6>
+                    </div>
+                    <div class="col-sm-9">
+                        <a>{{user.nome}}</a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">Email</h6>
+                    </div>
+                    <div class="col-sm-9">
+                        <a>{{user.email}}</a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">CPF</h6>
+                    </div>
+                    <div class="col-sm-9">
+                        <a>{{user.cpf}}</a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">Endereço</h6>
+                    </div>
+                    <div class="col-sm-9">
+                        <a>{{user.endereco}}</a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">Telefone</h6>
+                    </div>
+                    <div class="col-sm-9">
+                        <a>{{user.telefone}}</a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">Administrador</h6>
+                    </div>
+                    <div class="col-sm-9">
+                        {% if user.is_superuser %}
+                            <a>Você é Admin</a>                    
+                        {% else %}
+                            <a>Você não é Admin</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-9">
+                        <a href="#" class="btn btn-warning" type="button" data-bs-toggle="modal" data-bs-target="#modalPerfil">
+                            Editar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="modalPerfil" tabindex="-1" aria-labelledby="modalPerfilLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="modalPerfilLabel">Editar Perfil</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'perfil' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                        </div>
+                        {% for field in form %}
+                            <div class="mb-3">
+                                {{ field|as_crispy_field }}
+                            </div>
+                        {% endfor %}
+                        <div class="col">
+                            <button style="width: 100%;" id="buttonSubmit" class="btn submit  btn-success my-2" type="submit">
+                                Salvar
+                            </button>
+                            <button style="width: 100%;" type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Fechar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock main %}

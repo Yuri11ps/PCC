@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load permission_tags %}
+
+{% block main %}
+  <div class="card">
+    {% if tem %}
+      <a href="{% url "listar_avaliacao" None %}">Voltar para a listagem de todas as avaliações</a>
+    {% endif %}
+    <div class="d-flex justify-content-between">
+      <h5 class="card-header">{{title}}</h5>
+      {% if user|can:'adicionar_avaliacao' %}
+        <a href="{% url "adicionar_avaliacao" empresa_id %}">
+          <button type="button" class="btn btn-icon btn-primary mt-3 me-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-square-fill" viewBox="0 0 16 16">
+              <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0"/>
+            </svg>
+          </button>
+        </a>
+      {% endif %}
+    </div>
+    <div class="overflow-x-auto" style="height: 80vh;">
+      <table class="table ">
+        <thead class="table-light">
+          <tr>
+            <th>Empresa</th>
+            <th>Usuário</th>
+            <th>Nota</th>
+            <th>Comentarios</th> 
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody class="table-border-bottom-0">
+          {% for a in avaliacoes %}
+            <tr>
+              <td><strong>{{ a.empresa.nome }}</strong></td>
+              <td>{{ a.usuario }}</td>
+              <td>{{ a.notas }}</td>
+              <td>{{ a.comentario }}</td>
+              <td>
+                <div class="dropdown">
+                  <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                    <i class="bx bx-dots-vertical-rounded"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    {% if user|can:'editar_avaliacao' %}
+                      <a class="dropdown-item" href="{% url 'editar_avaliacao' a.id %}"
+                        ><i class="bx bx-edit-alt me-1"></i> Editar
+                      </a>
+                    {% endif %}
+                    {% if user|can:'deletar_avaliacao' %}
+                      <a class="dropdown-item" href="{% url 'deletar_avaliacao' a.id %}" onclick="return confirm('Tem certeza de que deseja excluir a avaliação?')">
+                        <i class="bx bx-trash me-1"></i> Deletar
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock main %}

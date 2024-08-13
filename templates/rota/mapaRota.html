@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load permission_tags %}
+
+{% block main %}
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+    </style>
+  <div class="card">
+    <div class="d-flex justify-content-between">
+      <h5 class="card-header">Destacar Ruas no Mapa</h5>
+      
+    </div>
+    <div class="overflow-x-auto" style="height: 80vh;">
+        <div id="map"></div>
+    </div>
+  </div>
+{% endblock main %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Inicializando o mapa com zoom inicial e centro de Guanambi
+        const map = L.map('map').setView([-14.212470, -42.796555], 14); // Coordenadas centrais de Guanambi
+
+        // Adicionando camada de tiles do OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Array de nomes de ruas para buscar
+        const streetNames = [
+            {% for r in rotas %}
+                '{{r.rua}}',    
+            {% endfor %}
+        ];
+
+        // Função para buscar e exibir a rua
+        function fetchAndDisplayStreet(streetName) {
+            // Construindo a consulta para uma rua
+            const query = `[out:json];way["name"="${streetName}"](around:10000,-14.212470,-42.796555);out geom;`;
+            const encodedQuery = encodeURIComponent(query);
+
+            // Usando a Overpass API para buscar a rua
+            fetch(`https://overpass-api.de/api/interpreter?data=${encodedQuery}`)
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            console.error(`Resposta da API para "${streetName}":`, text);
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(`Dados para "${streetName}":`, data); // Adiciona log dos dados
+                    if (data.elements.length > 0) {
+                        data.elements.forEach(element => {
+                            const coordinates = element.geometry.map(coord => [coord.lat, coord.lon]);
+                            L.polyline(coordinates, {color: 'red'}).addTo(map);
+                        });
+                    } else {
+                        console.log(`Rua "${streetName}" não encontrada.`);
+                    }
+                })
+                .catch(err => console.error(`Fetch error para "${streetName}":`, err));
+        }
+
+        // Buscar e exibir cada rua da lista
+        streetNames.forEach(streetName => fetchAndDisplayStreet(streetName));
+
+    </script>
+{% endblock scripts %}

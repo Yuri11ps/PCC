@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load permission_tags %}
+
+{% block main %}
+  <div class="card">
+    <div class="d-flex justify-content-between">
+      <h5 class="card-header">Empresas Cadastradas</h5>
+      {% if user|has_role:'admin' %}
+        <a href="{% url "adicionar_empresa" %}">
+          <button type="button" class="btn btn-icon btn-primary mt-3 me-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-square-fill" viewBox="0 0 16 16">
+              <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0"/>
+            </svg>
+          </button>
+        </a>
+      {% endif %}
+    </div>
+    <div class="overflow-x-scroll" style="height: 80vh;">
+      <table class="table">
+        <thead class="table-light">
+          <tr>
+            <th>Nome</th>
+            <th>Endereço</th>
+            <th>CNPJ</th> 
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody class="table-border-bottom-0">
+          {% for empresa in empresas %}
+            <tr>
+              <td><strong>{{ empresa.nome }}</strong></td>
+              <td>{{ empresa.endereco }}</td>
+              <td>{{ empresa.cnpj }}</td>
+              <td>
+                <div class="dropdown">
+                  <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                    <i class="bx bx-dots-vertical-rounded"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="{% url 'listar_avaliacao' empresa.id %}"
+                      ><i class="bx bx-message-alt me-1"></i> Avaliações
+                    </a>
+                    <a class="dropdown-item" href="{% url 'listar_rota' empresa.id %}"
+                      ><i class="bx bx-message-alt me-1"></i> Rotas
+                    </a>
+                    <a class="dropdown-item" href="{% url 'listar_equipamento' empresa.id %}"
+                      ><i class="bx bx-message-alt me-1"></i> Equipamentos
+                    </a>
+                    {% if user|has_role:'admin' %}
+                      <a class="dropdown-item" href="{% url 'editar_empresa' empresa.id %}"
+                        ><i class="bx bx-edit-alt me-1"></i> Editar
+                      </a>
+                      <a class="dropdown-item delete-empresa" href="{% url 'deletar_empresa' empresa.id %}" onclick="return confirm('Tem certeza de que deseja excluir a empresa?')">
+                        <i class="bx bx-trash me-1"></i> Deletar
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock main %}
